@@ -117,7 +117,6 @@ class GifImageState extends State<GifImage> {
   void dispose() {
     super.dispose();
     widget.controller.removeListener(_listener);
-    widget.controller.dispose();
   }
 
   @override
