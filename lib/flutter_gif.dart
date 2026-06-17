@@ -4,8 +4,6 @@
   time: 2022-04-18 09:54
 */
 
-library flutter_gif;
-
 import 'dart:io';
 import 'dart:ui' as ui show Codec;
 import 'dart:ui';
@@ -34,6 +32,7 @@ class GifCache {
 
 /// control gif
 class FlutterGifController extends AnimationController {
+  // ignore: use_super_parameters
   FlutterGifController({
     required TickerProvider vsync,
     double value = 0.0,
@@ -41,12 +40,12 @@ class FlutterGifController extends AnimationController {
     Duration? duration,
     AnimationBehavior? animationBehavior,
   }) : super.unbounded(
-          value: value,
-          reverseDuration: reverseDuration,
-          duration: duration,
-          animationBehavior: animationBehavior ?? AnimationBehavior.normal,
-          vsync: vsync,
-        );
+         value: value,
+         reverseDuration: reverseDuration,
+         duration: duration,
+         animationBehavior: animationBehavior ?? AnimationBehavior.normal,
+         vsync: vsync,
+       );
 
   @override
   void reset() {
@@ -206,14 +205,12 @@ final HttpClient _sharedHttpClient = HttpClient()..autoUncompress = false;
 HttpClient get _httpClient {
   HttpClient client = _sharedHttpClient;
 
-  assert(
-    () {
-      if (debugNetworkImageHttpClientProvider != null) {
-        client = debugNetworkImageHttpClientProvider!();
-      }
-      return true;
-    }(),
-  );
+  assert(() {
+    if (debugNetworkImageHttpClientProvider != null) {
+      client = debugNetworkImageHttpClientProvider!();
+    }
+    return true;
+  }());
 
   return client;
 }
@@ -224,10 +221,10 @@ Future<List<ImageInfo>> fetchGif(ImageProvider provider) async {
   final String key = provider is NetworkImage
       ? provider.url
       : provider is AssetImage
-          ? provider.assetName
-          : provider is MemoryImage
-              ? provider.bytes.toString()
-              : "";
+      ? provider.assetName
+      : provider is MemoryImage
+      ? provider.bytes.toString()
+      : "";
 
   if (GifImage.cache.caches.containsKey(key)) {
     infos = GifImage.cache.caches[key]!;
@@ -241,12 +238,11 @@ Future<List<ImageInfo>> fetchGif(ImageProvider provider) async {
       request.headers.add(name, value);
     });
     final HttpClientResponse response = await request.close();
-    bytes = await consolidateHttpClientResponseBytes(
-      response,
-    );
+    bytes = await consolidateHttpClientResponseBytes(response);
   } else if (provider is AssetImage) {
-    AssetBundleImageKey key =
-        await provider.obtainKey(const ImageConfiguration());
+    AssetBundleImageKey key = await provider.obtainKey(
+      const ImageConfiguration(),
+    );
     bytes = (await key.bundle.load(key.name)).buffer.asUint8List();
   } else if (provider is FileImage) {
     bytes = await provider.file.readAsBytes();
@@ -257,9 +253,9 @@ Future<List<ImageInfo>> fetchGif(ImageProvider provider) async {
   }
 
   final buffer = await ImmutableBuffer.fromUint8List(bytes);
-  ui.Codec codec =
-      await PaintingBinding.instance.instantiateImageCodecWithSize(buffer);
-  infos = [];
+  ui.Codec codec = await PaintingBinding.instance.instantiateImageCodecWithSize(
+    buffer,
+  );
   for (int i = 0; i < codec.frameCount; i++) {
     FrameInfo frameInfo = await codec.getNextFrame();
     infos.add(ImageInfo(image: frameInfo.image));
